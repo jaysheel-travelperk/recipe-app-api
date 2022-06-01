@@ -4,7 +4,7 @@ LABEL maintainer="jaysheel"
 # Tell python, do not buffer the output
 # O/P from python is printed directly to the console
 # Avoid delays of messaging getting delivered from python
-ENV PTHONUNBUFFERED 1
+ENV PYTHONUNBUFFERED 1
 
 # Copy from project to docker container (COPY SRC DST)
 COPY ./requirements.txt /tmp/requirements.txt
