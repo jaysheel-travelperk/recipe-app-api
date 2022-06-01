@@ -26,12 +26,22 @@ EXPOSE 8000
 # requirements --> Install our requirements inside virtual env
 # -rf /tmp --> remove tmp directory (keeping image light-weight)
 # adduser --> do not run as root user, adding new user without full privilidges for security purposes
+
+# jpeg-dev is added for handling images
+# zlib zlib-dev is needed as dependency for pillow
+
+# create a directory /vol/web/media
+# -p create subdirectories
+
+# create static and media directories
+# change owner (-R recursively of all sub-dirs)
+# chmod django-user can make changes
 ARG DEV=false
 RUN python -m venv /py && \
     /py/bin/pip install --upgrade pip && \
-    apk add --update --no-cache postgresql-client && \
+    apk add --update --no-cache postgresql-client jpeg-dev && \
     apk add --update --no-cache --virtual .tmp-build-deps \
-      build-base postgresql-dev musl-dev &&\
+      build-base postgresql-dev musl-dev zlib zlib-dev &&\
     /py/bin/pip install -r /tmp/requirements.txt && \
     if [ $DEV = "true" ]; \
         then /py/bin/pip install -r /tmp/requirements.dev.txt ; \
@@ -41,7 +51,11 @@ RUN python -m venv /py && \
     adduser \
         --disabled-password \
         --no-create-home \
-        django-user
+        django-user && \
+    mkdir -p /vol/web/media && \
+    mkdir -p /vol/web/static && \
+    chown -R django-user:django-user /vol && \
+    chmod -R 755 /vol
 
 # Update path inside the container to add python venv
 ENV PATH="/py/bin:$PATH"
